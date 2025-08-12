@@ -7,3 +7,43 @@
 #   - registry: 10.0.0.2:5000
 #     username: user
 #     password: pass
+
+# Registry mirrors
+crio_pause_image: registry.k8s.io/pause:3.9
+crio_registries:
+  - prefix: ghcr.io
+    insecure: false
+    blocked: false
+    location: registry-1.ghcr.io
+    unqualified: false
+    mirrors:
+      - location: 192.168.100.100:5000
+        insecure: true
+      - location: mirror.gcr.io
+        insecure: false
+  - prefix: docker.io
+    insecure: false
+    blocked: false
+    location: registry-1.docker.io
+    unqualified: true
+    mirrors:
+      - location: 192.168.100.100:5000
+        insecure: true
+      - location: mirror.gcr.io
+        insecure: false
+  - prefix: registry.k8s.io
+    insecure: false
+    blocked: false
+    location: registry.k8s.io
+    unqualified: false
+
+# Support for user namespaces. This feature is optional and can be enabled by setting the following two variables.
+crio_runtimes:
+  - name: crun
+    path: /usr/bin/crun
+    type: oci
+    root: /run/crun
+  - name: sysbox-runc
+    path: /usr/bin/sysbox-runc
+    type: oci
+    root: /run/sysbox
