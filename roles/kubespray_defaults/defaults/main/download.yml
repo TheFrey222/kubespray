@@ -88,6 +88,7 @@ docker_containerd_version: 1.6.32
 # gcr and kubernetes image repo define
 gcr_image_repo: "gcr.io"
 kube_image_repo: "registry.k8s.io"
+kubeadm_image_repo: "{{ kube_image_repo }}"
 
 # docker image repo define
 docker_image_repo: "docker.io"
@@ -113,7 +114,7 @@ flannel_version: 0.26.7
 flannel_cni_version: 1.7.1-flannel1
 cni_version: "{{ (cni_binary_checksums['amd64'] | dict2items)[0].key }}"
 
-cilium_version: "1.17.3"
+cilium_version: "1.17.7"
 cilium_cli_version: "{{ (ciliumcli_binary_checksums['amd64'] | dict2items)[0].key }}"
 cilium_enable_hubble: false
 
@@ -141,6 +142,8 @@ yq_version: "{{ (yq_checksums['amd64'] | dict2items)[0].key }}"
 
 gateway_api_version: "1.2.1"
 gateway_api_channel: "standard"
+
+prometheus_operator_crds_version: "{{ (prometheus_operator_crds_checksums.no_arch | dict2items)[0].key }}"
 
 github_url: https://github.com
 dl_k8s_io_url: https://dl.k8s.io
@@ -173,6 +176,7 @@ skopeo_download_url: "{{ github_url }}/lework/skopeo-binary/releases/download/v{
 yq_download_url: "{{ github_url }}/mikefarah/yq/releases/download/v{{ yq_version }}/yq_linux_{{ image_arch }}"
 argocd_install_url: "https://raw.githubusercontent.com/argoproj/argo-cd/v{{ argocd_version }}/manifests/install.yaml"
 gateway_api_crds_download_url: "{{ github_url }}/kubernetes-sigs/gateway-api/releases/download/v{{ gateway_api_version }}/{{ gateway_api_channel }}-install.yaml"
+prometheus_operator_crds_download_url: "{{ github_url }}/prometheus-operator/prometheus-operator/releases/download/v{{ prometheus_operator_crds_version }}/stripped-down-crds.yaml"
 
 etcd_binary_checksum: "{{ etcd_binary_checksums[image_arch][etcd_version] }}"
 cni_binary_checksum: "{{ cni_binary_checksums[image_arch][cni_version] }}"
@@ -969,6 +973,18 @@ downloads:
     dest: "{{ local_release_dir }}/gateway-api-{{ gateway_api_channel }}-install.yaml"
     checksum: "{{ lookup('vars', 'gateway_api_' + gateway_api_channel + '_crds_checksums').no_arch[gateway_api_version] }}"
     url: "{{ gateway_api_crds_download_url }}"
+    owner: "root"
+    mode: "0755"
+    groups:
+      - kube_control_plane
+
+  prometheus_operator_crds:
+    enabled: "{{ prometheus_operator_crds_enabled }}"
+    file: true
+    version: "{{ prometheus_operator_crds_version }}"
+    dest: "{{ local_release_dir }}/prometheus-operator-crds.yaml"
+    checksum: "{{ prometheus_operator_crds_checksums.no_arch[prometheus_operator_crds_version] }}"
+    url: "{{ prometheus_operator_crds_download_url }}"
     owner: "root"
     mode: "0755"
     groups:
