@@ -9,7 +9,9 @@
 #     password: pass
 
 # Registry mirrors
-crio_pause_image: registry.k8s.io/pause:3.9
+crio_pause_image: registry.k8s.io/pause:3.10
+
+# Use runc as the default OCI runtime to avoid crun/CRI-O incompatibility
 crio_registries:
   - prefix: ghcr.io
     insecure: false
@@ -38,11 +40,14 @@ crio_registries:
     unqualified: false
 
 # Support for user namespaces. This feature is optional and can be enabled by setting the following two variables.
+crio_default_runtime: runc
 crio_runtimes:
-  - name: crun
-    path: /usr/bin/crun
+  # runc is widely compatible and matches most distro CRI-O builds
+  - name: runc
+    path: /usr/bin/runc
     type: oci
-    root: /run/crun
+    root: /run/runc
+  # optional: sysbox runtime (requires sysbox to be installed)
   - name: sysbox-runc
     path: /usr/bin/sysbox-runc
     type: oci

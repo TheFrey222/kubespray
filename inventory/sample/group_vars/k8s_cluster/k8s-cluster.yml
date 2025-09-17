@@ -376,8 +376,11 @@ remove_anonymous_access: false
 #------------------------------------------------------------------------------
 
 # Kubernetes version
-kube_version: 1.32.7
+kube_version: 1.32.8
 kubelet_deployment_type: host
 
 # Allow pods on control plane (for single node)
 allow_ungraceful_removal_of_offline_nodes: true
+
+# Give kubeadm more time to bring up the API server on first boot
+kubeadm_init_timeout: 600s
